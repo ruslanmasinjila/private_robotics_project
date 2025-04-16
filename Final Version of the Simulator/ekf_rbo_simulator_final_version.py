@@ -180,6 +180,8 @@ plt.savefig("ekf_path_arrows_landmarks.png")
 
 "ekf_path_arrows_landmarks_full.png"
 
+ekf_anees = anees
+
 ###########################################################################
 # Range-Bearing-Only Simulation
 ###########################################################################
@@ -354,3 +356,34 @@ plt.legend(loc='upper right', fontsize=9)
 plt.tight_layout()
 plt.savefig("rbo_path_arrows_landmark.png")
 
+rbo_anees = anees
+
+def compute_rmse(df):
+    errors = df[['x_actual', 'y_actual', 'theta_actual']].values - df[['x_estimated', 'y_estimated', 'theta_estimated']].values
+    errors[:, 2] = np.arctan2(np.sin(errors[:, 2]), np.cos(errors[:, 2]))  # Normalize angle error
+    mse = np.mean(errors ** 2)
+    return np.sqrt(mse)
+
+# Apply to EKF and RBO
+ekf_rmse = compute_rmse(df_ekf)
+rbo_rmse = compute_rmse(df_rbo)
+
+
+
+print("RESULST")
+print("#########################")
+print("TIME STEPS", config['time_steps'])
+print("MOTION SEED", config['seed_motion'])
+print("SENSOR SEED", config['seed_sensor'])
+print("CHI-SQUARED BOUNDS", list(map(float, chi2_bounds)))
+print("#########################")
+
+print("EKF RMSE:", ekf_rmse)
+print("EKF ANEES:", ekf_anees)
+
+print("================================")
+
+print("RBO RMSE:", rbo_rmse)
+print("RBO ANEES:", rbo_anees)
+
+print("================================")
